@@ -49,11 +49,32 @@ def register():
         cur.close()
 
         flash('You are now registered and can log in', 'success')
-        return redirect(url_for('register'))
+        return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password_candidate = request.form['password']
 
+        # Create cursor
+        cur = mysql.connection.cursor()
+        # Get user By username
+        result = cur.execute("SELECT * FROM users WHERE username = %s", [username])
+        if result > 0:
+            # GET stored hash
+            data = cur.fetchone()
+            password = data['password']
+            # Compare the passwords
+            if sha256_crypt.verify(password_candidate, password):
+                app.logger.info('PASSWORD MATCHED')
+            else:
+                app.logger.info('PASSWORD NOT MATCHED')
+        else:
+            app.logger.info("No USER")
+    return render_template('login.html')
 
 @app.route('/')
 def index():
