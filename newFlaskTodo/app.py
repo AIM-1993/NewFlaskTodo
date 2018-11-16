@@ -1,9 +1,10 @@
+from functools import wraps
 from flask import Flask, render_template, flash, redirect, url_for, session, request, logging
-from data import Articles
-from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
-from functools import wraps
+from flask_mysqldb import MySQL
+from data import Articles
+
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
@@ -24,11 +25,11 @@ class RegisterForm(Form):
     name = StringField('Name', [validators.Length(min=1, max=50)])
     username = StringField('Username', [validators.Length(min=4, max=25)])
     email = StringField('Email', [validators.Length(min=6, max=50)])
-    password = PasswordField('Password',[
+    password = PasswordField('Password', [
         validators.DataRequired(),
         validators.EqualTo('confirm', message="Password Do Not Match.")
     ])
-    confirm = PasswordField('Confirm Password.')
+    confirm = PasswordField('Confirm Password')
 
 
 # Register
@@ -55,6 +56,7 @@ def register():
     return render_template('register.html', form=form)
 
 
+# Login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -79,7 +81,6 @@ def login():
             else:
                 error = "Password Not Match"
                 return render_template('login.html', error=error)
-            
             cur.close()
         else:
             error = "User Name Not Found"
@@ -99,20 +100,50 @@ def is_logged_in(f):
     return wrap
 
 
-
-
 # Logout
 @app.route('/logout')
+@is_logged_in
 def logout():
     session.clear()
     flash('You are now logged out', 'success')
     return redirect(url_for('login'))
+
 
 # Dashboard
 @app.route('/dashboard')
 @is_logged_in
 def dashboard():
     return render_template('dashboard.html')
+
+
+# Create Article Class
+class ArticleForm(Form):
+    title = StringField('Title', [validators.Length(min=1, max=200)])
+    body = TextAreaField('Body', [validators.Length(min=30)])
+
+
+@app.route('/add_article', methods=['GET', 'POST'])
+@is_logged_in
+def add_article():
+    form = ArticleForm(request.form)
+    if request.method == 'POST' and form.validate():
+        title = form.title.data
+        body = form.body.data
+
+        cur = mysql.connection.cursor()
+
+        cur.execute("INSERT INTO articles(title, body, author) VALUES(%s, %s, %s)", (title, body, session['username']))
+
+        mysql.connection.commit()
+
+        cur.close()
+
+        flash("Article Created", 'success')
+
+        return redirect(url_for('dashboard'))
+
+    return render_template('add_article.html', form=form)
+
 
 @app.route('/')
 def index():
@@ -133,6 +164,6 @@ def article(id):
 def about():
     return render_template('about.html')
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     app.run(debug=True)

@@ -18,6 +18,7 @@
     </ul>
     <ul class="navbar-nav navbar-right">
       {% if session.logged_in %}
+        <li><a class="nav-link" href="#">Hello, {{ session.username }}</a></li>
         <li><a class="nav-link" href="/logout">logout</a></li>
       {% else %}
         <li><a class="nav-link" href="/register">Register</a></li>
