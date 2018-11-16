@@ -128,12 +128,12 @@ class ArticleForm(Form):
     title = StringField('Title', [validators.Length(min=1, max=200)])
     body = TextAreaField('Body', [validators.Length(min=30)])
 
-
+# Add
 @app.route('/add_backlog', methods=['GET', 'POST'])
 @is_logged_in
 def add_backlog():
     form = ArticleForm(request.form)
-    if request.method == 'POST' and form.validate():
+    if request.method == 'POST':
         title = form.title.data
         body = form.body.data
         cur = mysql.connection.cursor()
@@ -161,6 +161,7 @@ def backlogs():
     if result > 0:
         return render_template('backlogs.html', backlogs=backlogs)
     else:
+        flash('目前暂无待办事项， 点击用户名进行添加', 'warning')
         return render_template('backlogs.html')
     # Close connection
     cur.close()

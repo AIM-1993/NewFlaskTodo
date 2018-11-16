@@ -1,7 +1,8 @@
 {% extends 'layout.html' %}
 {% block body %}
-  <h1>Dashboard <small> Welcome {{ session.username }}</small></h1>
-  <a class="btn btn-success" href="/add_backlog">Add Things</a>
+  <h1>Todolist</h1>
+  
+  <a class="btn btn-success" href="/add_backlog">添加待办事项</a>
   <hr>
   <table class="table table-striped">
     <tr>
@@ -18,11 +19,11 @@
       <td>{{ backlog.title }}</td>
       <td>{{ backlog.author }}</td>
       <td>{{ backlog.create_date }}</td>
-      <td><a href="edit_backlog/{{ backlog.id }}" class="btn btn-primary pullright">Edit</a></td>
+      <td><a href="edit_backlog/{{ backlog.id }}" class="btn btn-primary pullright">编辑</a></td>
       <td>
           <form action="{{ url_for('delete_backlog', id=backlog.id) }}" method="post">
               <input type="hidden" name="_method" value="DELETE">
-              <input type="submit" Value="Delete" class="btn btn-danger">
+              <input type="submit" value="删除" class="btn btn-danger">
           </form>
       </td>
     </tr>
