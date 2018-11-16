@@ -2,7 +2,7 @@
 
 {%  block body %}
   <h1>{{ backlog.title }}</h1>
-  <small>Written By  {{backlog.author }} on {{ backlog.create_date }}      <a class="btn btn-primary right" href="{{ url_for('dashboard') }}">编辑/删除</a></small>
+  <small>Written By  {{backlog.author }} on {{ backlog.create_date }}      <a class="btn btn-success pullright" href="{{ url_for('dashboard') }}">编辑/删除</a></small>
   <hr>
   <div>{{ backlog.body|safe }}</div>
 

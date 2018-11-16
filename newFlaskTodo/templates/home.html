@@ -2,11 +2,11 @@
 
 {% block body %}
   <div class="jumbotron text-center">
-    <h1>Welcome To NewFlaskToDoApp</h1>
+    <h1>欢迎使用NewFlaskTodo</h1>
     <p class='lead'>This is a new version of FlaskTodo</p>
     {% if session.logged_in == NULL %}
-      <a href="/register" class="btn btn-primary">Register</a>
-      <a href="/login" class="btn btn-success">Login</a>
+      <a href="/register" class="btn btn-primary">注册</a>
+      <a href="/login" class="btn btn-success">登陆</a>
     {% endif %}
   </div>
 {% endblock %}

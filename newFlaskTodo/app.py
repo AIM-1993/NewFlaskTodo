@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import Flask, render_template, flash, redirect, url_for, session, request, logging
+from flask import Flask, render_template, flash, redirect, url_for, session, request
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
 from flask_mysqldb import MySQL
@@ -16,6 +16,8 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 # init MYSQL
 mysql = MySQL(app)
+
+
 
 
 # Create Register Class
@@ -115,7 +117,6 @@ def dashboard():
 
     if result > 0:
         return render_template('dashboard.html', backlogs=backlogs)
-    
     else:
         return render_template('dashboard.html')
     # Close connection
@@ -173,7 +174,6 @@ def backlog(id):
     cur = mysql.connection.cursor()
     result = cur.execute("SELECT * FROM articles WHERE id=%s", [id])
     backlog = cur.fetchone()
-    
     return render_template('backlog.html', backlog=backlog)
 
 
