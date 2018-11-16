@@ -11,8 +11,8 @@
 应用采用: flask_mySQLdb与后端mysql数据库进行互联及数据交互。
 
 ![Blog详情页实际效果图]
-(https://github.com/AIM-1993/NewFlaskTodo/blob/master/example1.png)
-(https://github.com/AIM-1993/NewFlaskTodo/blob/master/example2.png)
-(https://github.com/AIM-1993/NewFlaskTodo/blob/master/example3.png)
-(https://github.com/AIM-1993/NewFlaskTodo/blob/master/example4.png)
-(https://github.com/AIM-1993/NewFlaskTodo/blob/master/example5.png)
+(https://raw.githubusercontent.com/AIM-1993/NewFlaskTodo/master/example1.png)
+(https://raw.githubusercontent.com/AIM-1993/NewFlaskTodo/master/example2.png)
+(https://raw.githubusercontent.com/AIM-1993/NewFlaskTodo/master/example3.png)
+(https://raw.githubusercontent.com/AIM-1993/NewFlaskTodo/master/example4.png)
+(https://raw.githubusercontent.com/AIM-1993/NewFlaskTodo/master/example5.png)
