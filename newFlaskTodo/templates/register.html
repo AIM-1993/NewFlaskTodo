@@ -1,7 +1,8 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-  <h1>Register</h1>
+  <hr>
+  <h2>用户注册</h2>
   {% from "includes/_formhelpers.html" import render_field %}
   <form method="POST" action="" autocomplete="off">
     <div class="form-group">
@@ -24,6 +25,6 @@
       <!--WTForms-->
       {{ render_field(form.confirm, class_='form-control') }}
     </div>
-    <p><input type="submit" class="btn btn-primary" value="Submit"></p>
+    <p><input type="submit" class="btn btn-primary" value="确认提交"></p>
   </form>
 {% endblock %}

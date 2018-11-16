@@ -3,7 +3,6 @@ from flask import Flask, render_template, flash, redirect, url_for, session, req
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
 from flask_mysqldb import MySQL
-# from data import Articles
 
 
 app = Flask(__name__)
@@ -18,18 +17,17 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 # init MYSQL
 mysql = MySQL(app)
 
-# Articles = Articles()
 
 # Create Register Class
 class RegisterForm(Form):
-    name = StringField('Name', [validators.Length(min=1, max=50)])
-    username = StringField('Username', [validators.Length(min=4, max=25)])
-    email = StringField('Email', [validators.Length(min=6, max=50)])
-    password = PasswordField('Password', [
+    name = StringField('用户昵称/NickName', [validators.Length(min=1, max=50)])
+    username = StringField('用户名/UserName', [validators.Length(min=4, max=25)])
+    email = StringField('邮箱/Email', [validators.Length(min=6, max=50)])
+    password = PasswordField('密码/Password', [
         validators.DataRequired(),
         validators.EqualTo('confirm', message="Password Do Not Match.")
     ])
-    confirm = PasswordField('Confirm Password')
+    confirm = PasswordField('密码确认/Confirm Password')
 
 
 # Register
@@ -50,7 +48,6 @@ def register():
         mysql.connection.commit()
         # Close connection
         cur.close()
-
         flash('You are now registered and can log in', 'success')
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
@@ -62,7 +59,6 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password_candidate = request.form['password']
-
         # Create cursor
         cur = mysql.connection.cursor()
         # Get user By username
@@ -75,7 +71,6 @@ def login():
             if sha256_crypt.verify(password_candidate, password):
                 session['logged_in'] = True
                 session['username'] = username
-
                 flash("You are now logged in.", "success")
                 return redirect(url_for('dashboard'))
             else:
@@ -95,7 +90,7 @@ def is_logged_in(f):
         if 'logged_in' in session:
             return f(*args, **kwargs)
         else:
-            flash('Unauthorized, Please login', 'danger')
+            flash('请先登陆！', 'danger')
             return redirect(url_for('login'))
     return wrap
 
@@ -116,28 +111,27 @@ def dashboard():
     # Create cursor
     cur = mysql.connection.cursor()
     result = cur.execute("SELECT * FROM articles")
-    articles = cur.fetchall()
+    backlogs = cur.fetchall()
 
     if result > 0:
-        return render_template('dashboard.html', articles=articles)
+        return render_template('dashboard.html', backlogs=backlogs)
     
     else:
-        msg = 'No Articles Found'
-        return render_template('dashboard.html', msg=msg)
+        return render_template('dashboard.html')
     # Close connection
     cur.close()
     return render_template('dashboard.html')
 
 
-# Create Article Class
+# Create Backlog Class
 class ArticleForm(Form):
     title = StringField('Title', [validators.Length(min=1, max=200)])
     body = TextAreaField('Body', [validators.Length(min=30)])
 
 
-@app.route('/add_article', methods=['GET', 'POST'])
+@app.route('/add_backlog', methods=['GET', 'POST'])
 @is_logged_in
-def add_article():
+def add_backlog():
     form = ArticleForm(request.form)
     if request.method == 'POST' and form.validate():
         title = form.title.data
@@ -146,9 +140,9 @@ def add_article():
         cur.execute("INSERT INTO articles(title, body, author) VALUES(%s, %s, %s)", (title, body, session['username']))
         mysql.connection.commit()
         cur.close()
-        flash("Article Created", 'success')
+        flash("待办事项添加完成", 'success')
         return redirect(url_for('dashboard'))
-    return render_template('add_article.html', form=form)
+    return render_template('add_backlog.html', form=form)
 
 
 @app.route('/')
@@ -156,30 +150,73 @@ def index():
     return render_template('home.html')
 
 
-@app.route('/articles')
-def articles():
+@app.route('/backlogs')
+@is_logged_in
+def backlogs():
     # Create cursor
     cur = mysql.connection.cursor()
     result = cur.execute("SELECT * FROM articles")
-    articles = cur.fetchall()
+    backlogs = cur.fetchall()
 
     if result > 0:
-        return render_template('articles.html', articles=articles)
-    
+        return render_template('backlogs.html', backlogs=backlogs)
     else:
-        msg = 'No Articles Found'
-        return render_template('articles.html', msg=msg)
+        return render_template('backlogs.html')
     # Close connection
     cur.close()
 
-
-@app.route('/article/<string:id>')
-def article(id):
+# Check
+@app.route('/backlog/<string:id>')
+@is_logged_in
+def backlog(id):
     cur = mysql.connection.cursor()
     result = cur.execute("SELECT * FROM articles WHERE id=%s", [id])
-    article = cur.fetchone()
+    backlog = cur.fetchone()
     
-    return render_template('article.html', article=article)
+    return render_template('backlog.html', backlog=backlog)
+
+
+# Edit
+@app.route('/edit_backlog/<string:id>', methods=['GET', 'POST'])
+@is_logged_in
+def edit_backlog(id):
+    # Create Cursor
+    cur = mysql.connection.cursor()
+    # Get backlog by id
+    result = cur.execute("SELECT * FROM articles WHERE id=%s", [id])
+    backlog = cur.fetchone()
+    # Get form
+    form = ArticleForm(request.form)
+    # Populate backlog form fields
+    form.title.data = backlog['title']
+    form.body.data = backlog['body']
+
+    if request.method == 'POST' and form.validate():
+        title = request.form['title']
+        body = request.form['body']
+        cur = mysql.connection.cursor()
+        cur.execute("UPDATE articles SET title=%s, body=%s WHERE id = %s", (title, body, id))
+        mysql.connection.commit()
+        cur.close()
+        flash("待办事项更新成功", 'success')
+        return redirect(url_for('dashboard'))
+    return render_template('edit_backlog.html', form=form)
+
+
+# Delete
+@app.route('/delete_backlog/<string:id>', methods=['POST'])
+@is_logged_in
+def delete_backlog(id):
+    # Create cursor
+    cur = mysql.connection.cursor()
+    # Execute
+    cur.execute("DELETE FROM articles WHERE id=%s", [id])
+    # Commit to DB
+    mysql.connection.commit()
+    #Close connection
+    cur.close()
+    flash("待办事项删除成功", 'success')
+    return redirect(url_for('dashboard'))
 
 
 @app.route('/about')

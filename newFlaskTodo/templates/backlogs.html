@@ -1,0 +1,10 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+  <h1>Backlogs</h1>
+  <ul class="list-group">
+  {% for backlog in backlogs %}
+    <li class="list-group-item"><a href="backlog/{{backlog.id}}">{{  backlog.title }}</a></li>
+  {% endfor %}
+  </ul>
+{% endblock %}

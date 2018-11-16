@@ -1,9 +1,9 @@
 {% extends 'layout.html' %}
 
 {%  block body %}
-<h1>Add Article</h1>
+<h1>Add Backlog</h1>
 {% from 'includes/_formhelpers.html' import render_field %}
-<form method="POST" action="">
+<form method="POST" action="" autocomplete="off">
     <div class="form-group">
         {{ render_field(form.title, class_="form-control") }}
     </div>

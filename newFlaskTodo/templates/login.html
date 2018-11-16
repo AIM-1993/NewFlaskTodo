@@ -1,16 +1,17 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-  <h1>Login</h1>
+  <h2>登录/Login</h2>
+  <hr>
   <form action="" method="POST">
     <div class='form-group'>
-      <label>Username</label>
+      <label>用户名/Username</label>
       <input type="text" name="username" class="form-control" value={{ request.form.username }}>
     </div>
     <div class="form-group">
-      <label>Password</label>
+      <label>密码/Password</label>
       <input type="password" name="password" autocomplete="off" class="form-control" value={{ request.form.password }}>
     </div>
-    <button type='submit' class='btn btn-primary'>Submit</button>
+    <button type='submit' class='btn btn-primary'>登录</button>
   </form>
 {% endblock %}
