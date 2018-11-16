@@ -3,6 +3,7 @@ from data import Articles
 from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
+from functools import wraps
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
@@ -18,7 +19,7 @@ mysql = MySQL(app)
 
 Articles = Articles()
 
-
+# Create Register Class
 class RegisterForm(Form):
     name = StringField('Name', [validators.Length(min=1, max=50)])
     username = StringField('Username', [validators.Length(min=4, max=25)])
@@ -30,6 +31,7 @@ class RegisterForm(Form):
     confirm = PasswordField('Confirm Password.')
 
 
+# Register
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm(request.form)
@@ -69,12 +71,48 @@ def login():
             password = data['password']
             # Compare the passwords
             if sha256_crypt.verify(password_candidate, password):
-                app.logger.info('PASSWORD MATCHED')
+                session['logged_in'] = True
+                session['username'] = username
+
+                flash("You are now logged in.", "success")
+                return redirect(url_for('dashboard'))
             else:
-                app.logger.info('PASSWORD NOT MATCHED')
+                error = "Password Not Match"
+                return render_template('login.html', error=error)
+            
+            cur.close()
         else:
-            app.logger.info("No USER")
+            error = "User Name Not Found"
+            return render_template('login.html', error=error)
     return render_template('login.html')
+
+
+# Check if user logged in
+def is_logged_in(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+        else:
+            flash('Unauthorized, Please login', 'danger')
+            return redirect(url_for('login'))
+    return wrap
+
+
+
+
+# Logout
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('You are now logged out', 'success')
+    return redirect(url_for('login'))
+
+# Dashboard
+@app.route('/dashboard')
+@is_logged_in
+def dashboard():
+    return render_template('dashboard.html')
 
 @app.route('/')
 def index():
