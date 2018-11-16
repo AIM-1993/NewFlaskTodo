@@ -1,37 +1,13 @@
-## Welcome to GitHub Pages
+## NewFlaskTodo
 
-You can use the [editor on GitHub](https://github.com/AIM-1993/NewFlaskTodo/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+一款基于Python Flask框架及MySQL数据库开发的blog风格的简单待办事项应用。
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+### 项目基于
 
-### Markdown
+项目基于Flask1.0.2Web框架及MySQL5.7进行开发，前端效果基于Boostrap4及部分Javascript进行实现。
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+# 项目描述
+-应用包括：运用session及WTForms实现的用户注册及登陆功能、任务事项编辑添加及删除功能（前端页面编辑由CKEditor进行实现。前端效果基于Bootstrap4进行实现。
+-应用采用flask_mySQLdb与后端mysql数据库进行互联及数据交互。
 
-```markdown
-Syntax highlighted code block
 
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/AIM-1993/NewFlaskTodo/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
