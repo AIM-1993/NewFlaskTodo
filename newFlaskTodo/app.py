@@ -3,7 +3,7 @@ from flask import Flask, render_template, flash, redirect, url_for, session, req
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
 from flask_mysqldb import MySQL
-from data import Articles
+# from data import Articles
 
 
 app = Flask(__name__)
@@ -18,7 +18,7 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 # init MYSQL
 mysql = MySQL(app)
 
-Articles = Articles()
+# Articles = Articles()
 
 # Create Register Class
 class RegisterForm(Form):
@@ -113,6 +113,19 @@ def logout():
 @app.route('/dashboard')
 @is_logged_in
 def dashboard():
+    # Create cursor
+    cur = mysql.connection.cursor()
+    result = cur.execute("SELECT * FROM articles")
+    articles = cur.fetchall()
+
+    if result > 0:
+        return render_template('dashboard.html', articles=articles)
+    
+    else:
+        msg = 'No Articles Found'
+        return render_template('dashboard.html', msg=msg)
+    # Close connection
+    cur.close()
     return render_template('dashboard.html')
 
 
@@ -129,19 +142,12 @@ def add_article():
     if request.method == 'POST' and form.validate():
         title = form.title.data
         body = form.body.data
-
         cur = mysql.connection.cursor()
-
         cur.execute("INSERT INTO articles(title, body, author) VALUES(%s, %s, %s)", (title, body, session['username']))
-
         mysql.connection.commit()
-
         cur.close()
-
         flash("Article Created", 'success')
-
         return redirect(url_for('dashboard'))
-
     return render_template('add_article.html', form=form)
 
 
@@ -152,12 +158,28 @@ def index():
 
 @app.route('/articles')
 def articles():
-    return render_template('articles.html', articles=Articles)
+    # Create cursor
+    cur = mysql.connection.cursor()
+    result = cur.execute("SELECT * FROM articles")
+    articles = cur.fetchall()
+
+    if result > 0:
+        return render_template('articles.html', articles=articles)
+    
+    else:
+        msg = 'No Articles Found'
+        return render_template('articles.html', msg=msg)
+    # Close connection
+    cur.close()
 
 
 @app.route('/article/<string:id>')
 def article(id):
-    return render_template('article.html', id=id)
+    cur = mysql.connection.cursor()
+    result = cur.execute("SELECT * FROM articles WHERE id=%s", [id])
+    article = cur.fetchone()
+    
+    return render_template('article.html', article=article)
 
 
 @app.route('/about')
